@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>zyno.sh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <div id="main-title">
+    <a href="#" class="navigate-link">
+      <p class="main-title-line">
+        zyno.sh/
+      </p><p class="typewrite main-title-line" data-period="6000" data-type='[ "nekotimer", "about-us", "contact-us" ]'>
+        <span class="wrap"></span>
+      </p>
+    </a>
+  </div>
+
+  </body>
+<style>
+  body {
+    background-color: #1e1e1e;
+    text-align: center;
+    color:#fff;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  * { color:#fff; text-decoration: none;}
+
+
+  .typewrite > .wrap {
+    border-right: 0.08em solid #fff;
+    animation: cursor-blinking 500ms infinite normal;
+  }
+  @keyframes cursor-blinking {
+    from{border-right-color: rgba(255,255,255);}
+    to{border-right-color: transparent;}
+  }
+
+  .main-title-line {
+    font-size: 3em;
+    display: inline-block;
+    margin: 0 0;
+    font-family: 'Google Sans Code', monospace;
+  }
+
+  .navigate-link {
+    display: inline-block;
+    border-bottom-color: rgba(255, 255, 255, 0);
+    transition: border-bottom-color 150ms linear;
+  }
+
+  .navigate-link.status-ready:hover {
+    border-bottom: 2px solid rgba(255, 255, 255, 1);
+  }
+</style>
+<script>
+  const TxtType = function (el, toRotate, period) {
+    this.toRotate = toRotate;
+    this.el = el;
+    this.loopNum = 0;
+    this.period = parseInt(period, 10) || 2000;
+    this.text = '';
+    this.tick();
+    this.isDeleting = false;
+  };
+
+  TxtType.prototype.tick = function() {
+    const i = this.loopNum % this.toRotate.length;
+    const fullText = this.toRotate[i];
+
+    if (this.isDeleting) {
+      this.text = fullText.substring(0, this.text.length - 1);
+    } else {
+      this.text = fullText.substring(0, this.text.length + 1);
+    }
+
+    this.el.innerHTML = '<span class="wrap">'+this.text+'</span>';
+
+    const that = this;
+    let delta = 200 - Math.random() * 100;
+
+    if (this.isDeleting) { delta /= 2; }
+
+    const parentLink = document.querySelector(".navigate-link");
+    if (this.text === fullText) {
+      parentLink.href = "/" + fullText;
+      parentLink.classList.add("status-ready");
+    } else {
+      parentLink.href = "#";
+      parentLink.classList.remove("status-ready");
+    }
+
+    if (!this.isDeleting && this.text === fullText) {
+      delta = this.period;
+      this.isDeleting = true;
+    } else if (this.isDeleting && this.text === '') {
+      this.isDeleting = false;
+      this.loopNum++;
+      delta = 500;
+    }
+
+    setTimeout(function() {
+      that.tick();
+    }, delta);
+  };
+
+  window.onload = function() {
+    const elements = document.getElementsByClassName('typewrite');
+    for (let i=0; i<elements.length; i++) {
+      const toRotate = elements[i].getAttribute('data-type');
+      const period = elements[i].getAttribute('data-period');
+      if (toRotate) {
+        new TxtType(elements[i], JSON.parse(toRotate), period);
+      }
+    }
+    // CSS INJECTION
+    // const css = document.createElement("style");
+    // css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+    // document.body.appendChild(css);
+  };
+</script>
+</html>
